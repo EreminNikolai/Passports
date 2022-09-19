@@ -1,0 +1,85 @@
+version: '3.4'
+
+services:
+
+  passports:
+    hostname: passports
+    container_name: passports_container
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80;
+    image: ${DOCKER_REGISTRY-}passports
+    ports:
+        - 80:80
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - logs-data:/home/logs
+    build:
+      context: .
+      dockerfile: Passports/Dockerfile
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    networks:
+      - postgres
+
+  postgres:
+    hostname: postgres
+    container_name: postgres_container
+    image: postgres:14.5
+    environment:    
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-111}
+    volumes:
+      - pg-data:/var/lib/postgres     
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5111:5432"
+    networks:
+      - postgres
+    restart: always
+
+  pgadmin:
+    hostname: pgadmin
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-111}
+    volumes:
+       - pgadmin-data:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - postgres
+    restart: always
+    
+  redis:
+    hostname: redis
+    container_name: redis_container
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/var/lib/redis
+      - redis-conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      - postgres
+    restart: always
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+    pg-data:
+    redis-data:
+    redis-conf:
+    pgadmin-data:
+    logs-data:
+        external: true
+  
