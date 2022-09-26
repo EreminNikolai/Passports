@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Passports.Api.Models.LoadData.Interfaces;
 using Passports.Api.Models.Passport.Interfaces;
 
 namespace Passports.Api.Controllers;
@@ -12,9 +13,12 @@ namespace Passports.Api.Controllers;
 public class PassportController : ControllerBase
 {
     private readonly IPassportProvider _passport;
-    public PassportController(IPassportProvider passport)
+    private readonly ILoader _loader;
+
+    public PassportController(IPassportProvider passport, ILoader loader)
     {
         _passport = passport;
+        _loader = loader;
     }
 
     /// <summary>
@@ -30,9 +34,9 @@ public class PassportController : ControllerBase
         return await _passport.Exists(series, number).ConfigureAwait(false); ;
     }
 
-    [HttpGet]
-    public string Get()
+    [HttpPost]
+    public async Task LoadData()
     {
-        return "HELLO WORLD!!! WELCOME TO HELL!!! 123";
+        await _loader.LoadAsync();
     }
 }

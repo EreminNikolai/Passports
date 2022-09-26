@@ -6,17 +6,28 @@ namespace Passports.Api.Models.LoadData.Storages;
 /// <summary>
 /// Хранилище базы данных
 /// </summary>
-internal class DbStorage : DbContext, IDbStorage
+internal sealed class DbStorageContext : DbContext, IDbStorage
 {
-    public DbStorage(DbContextOptions<DbStorage> options) : base(options)
+    public DbStorageContext(DbContextOptions<DbStorageContext> options) : base(options)
     {
-
+        
     }
 
     /// <summary>
     /// Получить список паспортов
     /// </summary>
-    public DbSet<Passport.Passports> Passports { get; set; }
+    public DbSet<Passport.Passport> Passports { get; set; }
+
+    public async Task Create(Dictionary<uint, List<uint>> series)
+    {
+        var passports = (
+            from seriesItem in series 
+            from number in seriesItem.Value 
+            select new Passport.Passport { Series = seriesItem.Key, Number = number })
+            .ToList();
+        await Passports.AddRangeAsync(passports);
+        await SaveChangesAsync();
+    }
 
     /// <summary>
     /// Определить наличия паспорта

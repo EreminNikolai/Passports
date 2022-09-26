@@ -7,7 +7,7 @@ namespace Passports.Api.Models.Passport;
 /// Модель паспорта
 /// </summary>
 [Table("passports")]
-internal class Passports
+internal class Passport
 {
     [Key]
     [Column("id")]

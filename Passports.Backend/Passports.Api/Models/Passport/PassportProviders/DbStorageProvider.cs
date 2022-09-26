@@ -6,17 +6,17 @@ using Passports.Api.Models.Passport.Interfaces;
 namespace Passports.Api.Models.Passport.PassportProviders;
 
 /// <summary>
-/// Провайдер работы с паспортом через Redis
+/// Провайдер работы с паспортом через базу данных
 /// </summary>
-public class RedisStorage: IPassportProvider
+public class DbStorageProvider : IPassportProvider
 {
-    private readonly IRedisStorage _redisStorage;
-    private readonly ILogger<RedisStorage> _logger;
+    private readonly IDbStorage _dbStorage;
     private readonly Settings _settings;
+    private readonly ILogger<DbStorageProvider> _logger;
 
-    public RedisStorage(IRedisStorage redisStorage, IOptions<Settings> options, ILogger<RedisStorage> logger)
+    public DbStorageProvider(IDbStorage dbStorage, IOptions<Settings> options, ILogger<DbStorageProvider> logger)
     {
-        _redisStorage = redisStorage;
+        _dbStorage = dbStorage;
         _settings = options.Value;
         _logger = logger;
         _logger.LogDebug("NLog injected into PassportProvider.DataBase");
@@ -34,7 +34,7 @@ public class RedisStorage: IPassportProvider
         if (!TryParse.ElementPassport(number, _settings.MaxNumber, out var numberUInt))
             return false;
 
-        var result = await _redisStorage.IsPassportExistAsync(seriesUInt, numberUInt);
+        var result = await _dbStorage.IsPassportExistAsync(seriesUInt, numberUInt);
         _logger.LogInformation($"Exists({series}, {number})={result}");
         return result;
     }

@@ -1,4 +1,6 @@
 ﻿using Passports.Api.Models.LoadData;
+using Passports.Api.Models.LoadData.Interfaces;
+using Passports.Api.Models.LoadData.Loaders;
 using Quartz;
 
 namespace Passports.Api.Services;
@@ -13,7 +15,8 @@ public static class QuartzService
     /// </summary>
     /// <param name="services"></param>
     /// <param name="configuration"></param>
-    public static void AddQuartz(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddQuartz<TJob>(this IServiceCollection services, IConfiguration configuration)
+        where TJob: IJob
     {
         services.AddQuartz(q =>
         {
@@ -24,7 +27,7 @@ public static class QuartzService
             q.UseDefaultThreadPool(tp => { tp.MaxConcurrency = 5; });
 
             var jobKey = new JobKey("DataLoadTriggerKey", "DataLoadTriggerGroup");
-            q.AddJob<LoadDataJob>(jobKey, j => j
+            q.AddJob<TJob>(jobKey, j => j
                 .WithDescription("Start loading data")
             );
 
@@ -38,5 +41,7 @@ public static class QuartzService
         });
 
         services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
+        
+        return services;
     }
 }

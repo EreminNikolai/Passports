@@ -6,20 +6,20 @@ using Passports.Api.Models.Passport.Interfaces;
 namespace Passports.Api.Models.Passport.PassportProviders;
 
 /// <summary>
-/// Провайдер работы с паспортом через файловое хранилище
+/// Провайдер работы с паспортом через Redis
 /// </summary>
-public class FileStorage : IPassportProvider
+public class RedisStorageProvider: IPassportProvider
 {
-    private readonly IFileStorage _fileStorage;
+    private readonly IRedisStorage _redisStorage;
+    private readonly ILogger<RedisStorageProvider> _logger;
     private readonly Settings _settings;
-    private readonly ILogger<FileStorage> _logger;
 
-    public FileStorage(IFileStorage fileStorage, IOptions<Settings> options, ILogger<FileStorage> logger)
+    public RedisStorageProvider(IRedisStorage redisStorage, IOptions<Settings> options, ILogger<RedisStorageProvider> logger)
     {
-        _fileStorage = fileStorage;
+        _redisStorage = redisStorage;
         _settings = options.Value;
         _logger = logger;
-        _logger.LogDebug("NLog injected into PassportProvider.FileStorage");
+        _logger.LogDebug("NLog injected into PassportProvider.DataBase");
     }
 
     /// <summary> Проверка на наличие паспорта </summary>
@@ -34,7 +34,7 @@ public class FileStorage : IPassportProvider
         if (!TryParse.ElementPassport(number, _settings.MaxNumber, out var numberUInt))
             return false;
 
-        var result = await _fileStorage.IsPassportExistAsync(seriesUInt, numberUInt).ConfigureAwait(false);
+        var result = await _redisStorage.IsPassportExistAsync(seriesUInt, numberUInt);
         _logger.LogInformation($"Exists({series}, {number})={result}");
         return result;
     }

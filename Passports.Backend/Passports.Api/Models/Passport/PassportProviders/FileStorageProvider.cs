@@ -6,20 +6,20 @@ using Passports.Api.Models.Passport.Interfaces;
 namespace Passports.Api.Models.Passport.PassportProviders;
 
 /// <summary>
-/// Провайдер работы с паспортом через базу данных
+/// Провайдер работы с паспортом через файловое хранилище
 /// </summary>
-public class DbStorage : IPassportProvider
+public class FileStorageProvider : IPassportProvider
 {
-    private readonly IDbStorage _dbStorage;
+    private readonly IFileStorage _fileStorage;
     private readonly Settings _settings;
-    private readonly ILogger<DbStorage> _logger;
+    private readonly ILogger<FileStorageProvider> _logger;
 
-    public DbStorage(IDbStorage dbStorage, IOptions<Settings> options, ILogger<DbStorage> logger)
+    public FileStorageProvider(IFileStorage fileStorage, IOptions<Settings> options, ILogger<FileStorageProvider> logger)
     {
-        _dbStorage = dbStorage;
+        _fileStorage = fileStorage;
         _settings = options.Value;
         _logger = logger;
-        _logger.LogDebug("NLog injected into PassportProvider.DataBase");
+        _logger.LogDebug("NLog injected into PassportProvider.FileStorage");
     }
 
     /// <summary> Проверка на наличие паспорта </summary>
@@ -34,7 +34,7 @@ public class DbStorage : IPassportProvider
         if (!TryParse.ElementPassport(number, _settings.MaxNumber, out var numberUInt))
             return false;
 
-        var result = await _dbStorage.IsPassportExistAsync(seriesUInt, numberUInt);
+        var result = await _fileStorage.IsPassportExistAsync(seriesUInt, numberUInt).ConfigureAwait(false);
         _logger.LogInformation($"Exists({series}, {number})={result}");
         return result;
     }
