@@ -30,6 +30,7 @@ public static class DbService
     {
         using var serviceScope = app.ApplicationServices.CreateScope();
         using var context = serviceScope.ServiceProvider.GetService<DbStorageContext>();
-        context?.Database.Migrate();
+        context?.Database.EnsureCreated();
+        //context?.Database.Migrate();
     }
 }

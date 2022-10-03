@@ -1,4 +1,6 @@
-using System.Configuration;
+using System.Reflection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using Passports.Api.Helpers;
 using Passports.Api.Models.LoadData;
@@ -7,7 +9,10 @@ using Passports.Api.Models.LoadData.Interfaces.Storages;
 using Passports.Api.Models.LoadData.Loaders;
 using Passports.Api.Models.Passport.Interfaces;
 using Passports.Api.Services;
-using Quartz;
+using Passports.Api.Services.Interfaces;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Passports.Api.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,10 +61,46 @@ switch (mode)
 
 builder.Services.AddQuartz<LoadDataJob>(builder.Configuration);
 
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddProfile(new AssemblyMappingProfile(Assembly.GetExecutingAssembly()));
+    config.AddProfile(new AssemblyMappingProfile(typeof(IDbStorage).Assembly));
+});
+
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.AllowAnyOrigin();
+    });
+});
+
+builder.Services.AddAuthentication(config =>
+    {
+        config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer("Bearer", options =>
+    {
+        //options.Authority = "https://localhost:6007/";
+        options.Authority = "https://localhost:7061/";
+        options.Audience = "PassportsWebAPI";
+        options.RequireHttpsMetadata = false;
+    });
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddVersionedApiExplorer(options => options.GroupNameFormat = "'v'VVV");
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 builder.Services.AddSwaggerGen();
+builder.Services.AddApiVersioning();
+
+builder.Services.AddSingleton<ICurrentUserService, CurrentUserService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -69,14 +110,29 @@ if(mode == Modes.Postgres)
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(config =>
+    {
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            config.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant());
+            config.RoutePrefix = string.Empty;
+        }
+    });
 }
 
+app.UseRouting();
 app.UseHttpsRedirection();
-
+app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllers();
+app.UseApiVersioning();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();

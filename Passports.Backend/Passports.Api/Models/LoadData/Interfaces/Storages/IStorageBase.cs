@@ -3,7 +3,7 @@
 public interface IStorageBase
 {
     /// <summary>
-    /// Создать файловое хранилище
+    /// Создать хранилище
     /// </summary>
     /// <param name="passports">Данные, которые необходимо сохранить в хранилище</param>
     /// <returns></returns>

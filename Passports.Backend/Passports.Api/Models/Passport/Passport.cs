@@ -7,7 +7,7 @@ namespace Passports.Api.Models.Passport;
 /// Модель паспорта
 /// </summary>
 [Table("passports")]
-internal class Passport
+public class Passport
 {
     [Key]
     [Column("id")]
@@ -16,4 +16,6 @@ internal class Passport
     public uint Series { get; set; }
     [Column("number")]
     public uint Number { get; set; }
+    [Column("user_id")]
+    public Guid UserId { get; set; }
 }

@@ -10,14 +10,36 @@ services:
       - ASPNETCORE_URLS=http://+:80;
     image: ${DOCKER_REGISTRY-}passports
     ports:
-        - 80:80
+        - 81:80
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - logs-data:/home/logs
     build:
       context: .
-      dockerfile: Passports/Dockerfile
+      dockerfile: Passports.Api/Dockerfile
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    networks:
+      - postgres
+
+  auth:
+    hostname: auth
+    container_name: auth_container
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80;
+    image: ${DOCKER_REGISTRY-}auth
+    ports:
+        - 82:80
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    build:
+      context: .
+      dockerfile: Passports.Identity/Dockerfile
     links:
       - postgres
     depends_on:
@@ -28,7 +50,7 @@ services:
   postgres:
     hostname: postgres
     container_name: postgres_container
-    image: postgres:14.5
+    image: postgres
     environment:    
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-111}
@@ -81,5 +103,3 @@ volumes:
     redis-conf:
     pgadmin-data:
     logs-data:
-        external: true
-  

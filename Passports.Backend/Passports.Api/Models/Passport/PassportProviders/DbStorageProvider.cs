@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Passports.Api.Helpers;
+using Passports.Api.Models.Dto;
 using Passports.Api.Models.LoadData.Interfaces.Storages;
 using Passports.Api.Models.Passport.Interfaces;
 
@@ -37,5 +38,20 @@ public class DbStorageProvider : IPassportProvider
         var result = await _dbStorage.IsPassportExistAsync(seriesUInt, numberUInt);
         _logger.LogInformation($"Exists({series}, {number})={result}");
         return result;
+    }
+
+    public async Task<int> Create(Passport passport)
+    {
+        return await _dbStorage.Create(passport);
+    }
+
+    public async Task Update(Passport passport)
+    {
+        await _dbStorage.Update(passport);
+    }
+
+    public async Task<List<PassportDto>> GetAll(int skip, int top)
+    {
+        return await _dbStorage.GetAll(skip, top);
     }
 }
