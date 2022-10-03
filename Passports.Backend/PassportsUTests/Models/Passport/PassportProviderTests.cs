@@ -14,19 +14,19 @@ namespace PassportsUTests.Models.Passport
     [TestFixture]
     public class PassportProviderTests
     {
-        private PassportProviders.FileStorage _fileStorage;
-        private PassportProviders.DbStorage _dbStorage;
-        private PassportProviders.RedisStorage _redisStorage;
+        private PassportProviders.FileStorageProvider _fileStorageProvider;
+        private PassportProviders.DbStorageProvider _dbStorageProvider;
+        private PassportProviders.RedisStorageProvider _redisStorageProvider;
 
         [SetUp]
         public void SetUp()
         {
-            _fileStorage = CreateFileStorage();
-            _dbStorage = CreateDbStorage();
-            _redisStorage = CreateRedisStorage();
+            _fileStorageProvider = CreateFileStorage();
+            _dbStorageProvider = CreateDbStorage();
+            _redisStorageProvider = CreateRedisStorage();
         }
 
-        private PassportProviders.DbStorage CreateDbStorage()
+        private PassportProviders.DbStorageProvider CreateDbStorage()
         {
             var pair = new KeyValuePair<uint, List<uint>>(1, new List<uint> { 1 });
             var dir = new Dictionary<uint, List<uint>> { [pair.Key] = pair.Value };
@@ -46,12 +46,12 @@ namespace PassportsUTests.Models.Passport
             var options = mock.Object;
             
             //Logger
-            var mockLogger = new Mock<ILogger<PassportProviders.DbStorage>>();
+            var mockLogger = new Mock<ILogger<PassportProviders.DbStorageProvider>>();
             
-            return new PassportProviders.DbStorage(dbStorage, options, mockLogger.Object);
+            return new PassportProviders.DbStorageProvider(dbStorage, options, mockLogger.Object);
         }
 
-        private PassportProviders.FileStorage CreateFileStorage()
+        private PassportProviders.FileStorageProvider CreateFileStorage()
         {
             var pair = new KeyValuePair<uint, List<uint>>(1, new List<uint> { 1 });
             var dir = new Dictionary<uint, List<uint>> { [pair.Key] = pair.Value };
@@ -73,12 +73,12 @@ namespace PassportsUTests.Models.Passport
             var options = mock.Object;
             
             //Logger
-            var mockLogger = new Mock<ILogger<PassportProviders.FileStorage>>();
+            var mockLogger = new Mock<ILogger<PassportProviders.FileStorageProvider>>();
 
-            return new PassportProviders.FileStorage(fileStorage, options, mockLogger.Object);
+            return new PassportProviders.FileStorageProvider(fileStorage, options, mockLogger.Object);
         }
 
-        private PassportProviders.RedisStorage CreateRedisStorage()
+        private PassportProviders.RedisStorageProvider CreateRedisStorage()
         {
             var pair = new KeyValuePair<uint, List<uint>>(1, new List<uint> { 1 });
             var dir = new Dictionary<uint, List<uint>> { [pair.Key] = pair.Value };
@@ -98,9 +98,9 @@ namespace PassportsUTests.Models.Passport
             var options = mock.Object;
 
             //Logger
-            var mockLogger = new Mock<ILogger<PassportProviders.RedisStorage>>();
+            var mockLogger = new Mock<ILogger<PassportProviders.RedisStorageProvider>>();
 
-            return new PassportProviders.RedisStorage(redisStorage, options, mockLogger.Object);
+            return new PassportProviders.RedisStorageProvider(redisStorage, options, mockLogger.Object);
         }
 
 
@@ -115,7 +115,7 @@ namespace PassportsUTests.Models.Passport
         [TestCase("1", "1", ExpectedResult = true, TestName = "Проверка на корректный серию и номер паспорта")]
         public async Task<bool> ExistsCheckingParamsFileStorageTest(string series, string number)
         {
-            return await _fileStorage.Exists(series, number);
+            return await _fileStorageProvider.Exists(series, number);
         }
         
         [TestCase("0", "1", ExpectedResult = false, TestName = "Проверка на некорректное значение серии '0'")]
@@ -131,7 +131,7 @@ namespace PassportsUTests.Models.Passport
         [TestCase("1", "1", ExpectedResult = true, TestName = "Проверка на корректный серию и номер паспорта")]
         public async Task<bool> ExistsCheckingParamsRedisStorageTest(string series, string number)
         {
-            return await _redisStorage.Exists(series, number);
+            return await _redisStorageProvider.Exists(series, number);
         }
 
         [TestCase("0", "1", ExpectedResult = false, TestName = "Проверка на некорректное значение серии '0'")]
@@ -145,7 +145,7 @@ namespace PassportsUTests.Models.Passport
         [TestCase("1", "1", ExpectedResult = true, TestName = "Проверка на корректный серию и номер паспорта")]
         public async Task<bool> ExistsCheckingParamsDbStorageTest(string series, string number)
         {
-            return await _dbStorage.Exists(series, number);
+            return await _dbStorageProvider.Exists(series, number);
         }
 
     }

@@ -47,4 +47,9 @@ internal class RedisStorage: IRedisStorage
         _logger.LogInformation($"Exists({series}, {number})={result}");
         return result;
     }
+    
+    public Task Create(Dictionary<uint, List<uint>> passports)
+    {
+        return Task.CompletedTask;
+    }
 }

@@ -5,8 +5,8 @@
 /// </summary>
 internal enum Modes
 {
-    /// <summary> База данных </summary>
-    Database = 0,
+    /// <summary> База данных Postgres</summary>
+    Postgres = 0,
     /// <summary> Файловая система </summary>
     FileStorage = 1,
     /// <summary> Сервис Redis </summary>

@@ -3,7 +3,7 @@ CREATE DATABASE testdb;
 \c testdb
 
 CREATE TABLE public.passports (
-	id int4 NULL GENERATED ALWAYS AS IDENTITY,
+	id int4 NOT NULL GENERATED ALWAYS AS IDENTITY,
 	series int4 NOT NULL DEFAULT 0,
 	"number" int4 NOT NULL DEFAULT 0,
 	CONSTRAINT passports_un UNIQUE (id)

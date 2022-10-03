@@ -1,15 +1,29 @@
-﻿namespace Passports.Api.Models.LoadData.Interfaces.Storages;
+﻿using Passports.Api.Models.Dto;
+
+namespace Passports.Api.Models.LoadData.Interfaces.Storages;
 
 /// <summary>
 /// Хранилище в базе данных
 /// </summary>
-public interface IDbStorage
+public interface IDbStorage : IStorageBase
 {
     /// <summary>
-    /// Определить наличия паспорта
+    /// Создать паспорт
     /// </summary>
-    /// <param name="series">Серия паспорта</param>
-    /// <param name="number">Номер паспорта</param>
+    /// <param name="passports">Данные, которые необходимо сохранить в хранилище</param>
     /// <returns></returns>
-    Task<bool> IsPassportExistAsync(uint series, uint number);
+    Task<int> Create(Passport.Passport passports);
+
+    /// <summary>
+    /// Обновить паспорт
+    /// </summary>
+    /// <param name="passports">Данные, которые необходимо сохранить в хранилище</param>
+    /// <returns></returns>
+    Task Update(Passport.Passport passports);
+
+    /// <summary>
+    /// Получить список паспортов
+    /// </summary>
+    /// <returns></returns>
+    Task<List<PassportDto>> GetAll(int skip, int top);
 }

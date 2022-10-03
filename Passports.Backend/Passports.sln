@@ -9,6 +9,8 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Passports.Api", "Passports.Api\Passports.Api.csproj", "{EA0BC78A-1DE4-48B0-8A24-4FEB97C98B8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Passports.Identity", "Passports.Identity\Passports.Identity.csproj", "{AA2B93E3-39D6-4498-8FF8-0AC65D01AA44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{EA0BC78A-1DE4-48B0-8A24-4FEB97C98B8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA0BC78A-1DE4-48B0-8A24-4FEB97C98B8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA0BC78A-1DE4-48B0-8A24-4FEB97C98B8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA2B93E3-39D6-4498-8FF8-0AC65D01AA44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA2B93E3-39D6-4498-8FF8-0AC65D01AA44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA2B93E3-39D6-4498-8FF8-0AC65D01AA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA2B93E3-39D6-4498-8FF8-0AC65D01AA44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
